@@ -52,7 +52,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Logo */}
         <div className="p-6 border-b border-dark-600">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">N</div>
+            <img src="/logo.png" alt="Standard Chartered" className="w-8 h-8 object-contain" />
             <span className="font-display font-bold text-lg">Standard Chartered</span>
           </div>
         </div>
