@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  phone         String?
+  role          String    @default("user") // "user" | "admin"
+  createdAt     DateTime  @default(now())
+
+  accounts      Account[]
+  loans         Loan[]
+  notifications Notification[]
+  cards         Card[]
+}
+
+model Account {
+  id            String    @id @default(cuid())
+  accountNumber String    @unique
+  balance       Float     @default(0)
+  type          String    @default("savings") // "savings" | "current"
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+
+  sentTransactions     Transaction[] @relation("sender")
+  receivedTransactions Transaction[] @relation("receiver")
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  amount          Float
+  type            String   // "transfer" | "deposit" | "withdrawal"
+  description     String?
+  status          String   @default("completed") // "completed" | "pending" | "failed"
+  senderId        String?
+  receiverId      String?
+  sender          Account? @relation("sender", fields: [senderId], references: [id])
+  receiver        Account? @relation("receiver", fields: [receiverId], references: [id])
+  createdAt       DateTime @default(now())
+}
+
+model Loan {
+  id          String   @id @default(cuid())
+  amount      Float
+  interest    Float    @default(5)
+  duration    Int      // months
+  status      String   @default("pending") // "pending" | "approved" | "rejected" | "repaid"
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Card {
+  id          String   @id @default(cuid())
+  cardNumber  String   @unique
+  cardHolder  String
+  expiry      String
+  cvv         String
+  type        String   @default("debit") // "debit" | "credit"
+  frozen      Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  code      String
+  email     String
+  type      String   // "login" | "reset"
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
