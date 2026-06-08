@@ -1,11 +1,25 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const fromEmail = "Standard Chartered <onboarding@resend.dev>";
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
+  port: Number(process.env.SMTP_PORT) || 465,
+  secure: true, // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || "Standard Chartered <noreply@bank.local>";
 
 export async function sendOtpEmail(to: string, code: string, name: string) {
   try {
-    await resend.emails.send({
+    if (!process.env.SMTP_USER) {
+      console.log(`[LOCAL TEST] OTP Code for ${to} is: ${code}`);
+      return;
+    }
+
+    const info = await transporter.sendMail({
       from: fromEmail,
       to,
       subject: "Your Standard Chartered Verification Code",
@@ -22,6 +36,7 @@ export async function sendOtpEmail(to: string, code: string, name: string) {
         </div>
       `,
     });
+    console.log("OTP Email sent successfully", info.messageId);
   } catch (error) {
     console.error("Error sending OTP email:", error);
   }
@@ -29,7 +44,12 @@ export async function sendOtpEmail(to: string, code: string, name: string) {
 
 export async function sendWelcomeEmail(to: string, name: string) {
   try {
-    await resend.emails.send({
+    if (!process.env.SMTP_USER) {
+      console.log(`[LOCAL TEST] Welcome Email would be sent to ${to}`);
+      return;
+    }
+
+    const info = await transporter.sendMail({
       from: fromEmail,
       to,
       subject: "Welcome to Standard Chartered!",
@@ -39,10 +59,11 @@ export async function sendWelcomeEmail(to: string, name: string) {
           <p>We're thrilled to have you on board.</p>
           <p>Your account has been successfully created and credited with a <strong>$100.00</strong> welcome bonus!</p>
           <p>You can now log in to your dashboard to start managing your finances, applying for loans, and making transfers.</p>
-          <a href="http://localhost:3000/login" style="display: inline-block; background-color: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 15px;">Go to Dashboard</a>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login" style="display: inline-block; background-color: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 15px;">Go to Dashboard</a>
         </div>
       `,
     });
+    console.log("Welcome Email sent successfully", info.messageId);
   } catch (error) {
     console.error("Error sending welcome email:", error);
   }
