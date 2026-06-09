@@ -1,25 +1,16 @@
-import nodemailer from "nodemailer";
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: Number(process.env.SMTP_PORT) || 465,
-  secure: true, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
-const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || "Standard Chartered <noreply@bank.local>";
+const resend = new Resend(process.env.RESEND_API_KEY);
+const fromEmail = process.env.SMTP_FROM_EMAIL || "Standard Chartered <noreply@yourdomain.com>"; // Ensure this is a verified domain in Resend
 
 export async function sendOtpEmail(to: string, code: string, name: string) {
   try {
-    if (!process.env.SMTP_USER) {
+    if (!process.env.RESEND_API_KEY) {
       console.log(`[LOCAL TEST] OTP Code for ${to} is: ${code}`);
       return;
     }
 
-    const info = await transporter.sendMail({
+    const data = await resend.emails.send({
       from: fromEmail,
       to,
       subject: "Your Standard Chartered Verification Code",
@@ -36,7 +27,7 @@ export async function sendOtpEmail(to: string, code: string, name: string) {
         </div>
       `,
     });
-    console.log("OTP Email sent successfully", info.messageId);
+    console.log("OTP Email sent successfully", data.data?.id);
   } catch (error) {
     console.error("Error sending OTP email:", error);
   }
@@ -44,12 +35,12 @@ export async function sendOtpEmail(to: string, code: string, name: string) {
 
 export async function sendWelcomeEmail(to: string, name: string) {
   try {
-    if (!process.env.SMTP_USER) {
+    if (!process.env.RESEND_API_KEY) {
       console.log(`[LOCAL TEST] Welcome Email would be sent to ${to}`);
       return;
     }
 
-    const info = await transporter.sendMail({
+    const data = await resend.emails.send({
       from: fromEmail,
       to,
       subject: "Welcome to Standard Chartered!",
@@ -63,7 +54,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
         </div>
       `,
     });
-    console.log("Welcome Email sent successfully", info.messageId);
+    console.log("Welcome Email sent successfully", data.data?.id);
   } catch (error) {
     console.error("Error sending welcome email:", error);
   }

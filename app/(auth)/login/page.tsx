@@ -8,6 +8,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [step, setStep] = useState<"credentials" | "otp">("credentials");
   const [form, setForm] = useState({ email: "", password: "", otp: "" });
+  const [authEmail, setAuthEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -47,6 +48,7 @@ export default function LoginPage() {
         throw new Error("Failed to send OTP");
       }
 
+      setAuthEmail(form.email);
       setStep("otp");
     } catch (err) {
       setError("Failed to send verification code. Please try again.");
@@ -64,7 +66,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/otp", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, code: form.otp, type: "login" }),
+        body: JSON.stringify({ email: authEmail, code: form.otp, type: "login" }),
       });
 
       if (!res.ok) {
@@ -92,7 +94,7 @@ export default function LoginPage() {
         {step === "credentials" ? "Welcome back" : "Verification"}
       </h1>
       <p className="text-gray-400 text-sm mb-8">
-        {step === "credentials" ? "Sign in to your account" : `Enter the 6-digit code sent to ${form.email}`}
+        {step === "credentials" ? "Sign in to your account" : `Enter the 6-digit code sent to ${authEmail}`}
       </p>
 
       {error && (
