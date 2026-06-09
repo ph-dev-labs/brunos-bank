@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
+import { useCurrency } from "@/components/CurrencyProvider";
 
 export default function LoansPage() {
+  const { formatCurrency } = useCurrency();
   const [loans, setLoans] = useState<any[]>([]);
   const [form, setForm] = useState({ amount: "", duration: "6" });
   const [loading, setLoading] = useState(false);

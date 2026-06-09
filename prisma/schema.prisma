@@ -21,6 +21,21 @@ model User {
   loans         Loan[]
   notifications Notification[]
   cards         Card[]
+  imfCodes      ImfCode[]
+}
+
+model ImfCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AppConfig {
+  id        String   @id @default("global")
+  currency  String   @default("USD")
 }
 
 model Account {
@@ -41,11 +56,15 @@ model Transaction {
   amount          Float
   type            String   // "transfer" | "deposit" | "withdrawal"
   description     String?
-  status          String   @default("completed") // "completed" | "pending" | "failed"
+  status          String   @default("completed") // "completed" | "pending" | "failed" | "pending_admin_approval"
   senderId        String?
   receiverId      String?
   sender          Account? @relation("sender", fields: [senderId], references: [id])
   receiver        Account? @relation("receiver", fields: [receiverId], references: [id])
+  externalBank          String?
+  externalAccountName   String?
+  externalAccountNumber String?
+  imfCode               String?
   createdAt       DateTime @default(now())
 }
 
@@ -67,6 +86,7 @@ model Card {
   expiry      String
   cvv         String
   type        String   @default("debit") // "debit" | "credit"
+  status      String   @default("pending") // "pending" | "approved" | "rejected"
   frozen      Boolean  @default(false)
   userId      String
   user        User     @relation(fields: [userId], references: [id])

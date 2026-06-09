@@ -3,6 +3,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: "home" },
@@ -80,8 +81,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* User */}
-        <div className="p-4 border-t border-dark-600">
-          <div className="flex items-center gap-3 px-3 py-2 mb-2">
+        <div className="p-4 border-t border-dark-600 space-y-3">
+          <div className="flex items-center gap-3 px-3 py-2">
             <div className="w-8 h-8 bg-primary-500/20 rounded-full flex items-center justify-center text-primary-500 font-bold text-sm">
               {session.user.name[0]}
             </div>
@@ -89,6 +90,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <p className="text-sm font-medium truncate">{session.user.name}</p>
               <p className="text-xs text-gray-400 capitalize">{session.user.role}</p>
             </div>
+          </div>
+          <div className="px-1">
+            <LanguageSwitcher />
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
@@ -113,8 +117,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="font-display font-bold">Standard Chartered</span>
-          <div className="w-9" />
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="Standard Chartered" className="w-6 h-6 object-contain" />
+            <span className="font-display font-bold">Standard Chartered</span>
+          </div>
+          <LanguageSwitcher />
         </div>
 
         <div className="p-6 max-w-5xl mx-auto">{children}</div>

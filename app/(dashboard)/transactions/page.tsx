@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
+import { useCurrency } from "@/components/CurrencyProvider";
 
 export default function TransactionsPage() {
+  const { formatCurrency } = useCurrency();
   const [data, setData] = useState<any>(null);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);

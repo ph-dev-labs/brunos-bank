@@ -63,3 +63,22 @@ body {
   background: #333;
   border-radius: 2px;
 }
+
+/* Google Translate – fully hidden; driven by LanguageSwitcher component */
+#google_translate_element {
+  position: absolute;
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Hide the injected banner that Google Translate adds to the top of the page */
+.goog-te-banner-frame,
+.skiptranslate {
+  display: none !important;
+}
+
+body {
+  top: 0 !important; /* Google Translate pushes body down; undo it */
+}
+

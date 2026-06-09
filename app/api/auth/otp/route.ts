@@ -36,8 +36,10 @@ export async function POST(req: Request) {
     // Log the OTP to console for easy testing locally
     console.log(`[OTP GENERATED] ${email} - Code: ${code} (Type: ${type})`);
 
-    // Send the email
-    await sendOtpEmail(email, code, userName);
+    // Send the email in the background (fire-and-forget) so we don't block the response
+    sendOtpEmail(email, code, userName).catch((err) =>
+      console.error("Background OTP email failed:", err)
+    );
 
     return NextResponse.json({ message: "OTP sent successfully" });
   } catch (error) {

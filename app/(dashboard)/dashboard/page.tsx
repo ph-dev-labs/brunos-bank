@@ -8,6 +8,14 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
 
+  let configCurrency = "USD";
+  try {
+    const config = await prisma.appConfig.findUnique({ where: { id: "global" } });
+    if (config) configCurrency = config.currency;
+  } catch (e) {
+    console.error("Failed to fetch global config", e);
+  }
+
   const account = await prisma.account.findFirst({ where: { userId: session.user.id } });
   const unreadCount = await prisma.notification.count({ where: { userId: session.user.id, read: false } });
 
@@ -49,7 +57,7 @@ export default async function DashboardPage() {
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4" />
         <p className="text-blue-100 text-sm font-medium mb-1">Available Balance</p>
-        <p className="text-4xl font-display font-bold mb-4">{formatCurrency(account?.balance ?? 0)}</p>
+        <p className="text-4xl font-display font-bold mb-4">{formatCurrency(account?.balance ?? 0, configCurrency)}</p>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-blue-200 text-xs">Account Number</p>
@@ -65,7 +73,7 @@ export default async function DashboardPage() {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Sent", value: formatCurrency(totalSent), icon: "trending_up", color: "text-red-400" },
+          { label: "Total Sent", value: formatCurrency(totalSent, configCurrency), icon: "trending_up", color: "text-red-400" },
           { label: "Transactions", value: recentTransactions.length.toString(), icon: "receipt_long", color: "text-blue-400" },
           { label: "Active Loans", value: loans.filter((l) => l.status === "approved").length.toString(), icon: "account_balance_wallet", color: "text-yellow-400" },
           { label: "Account Status", value: "Active", icon: "verified", color: "text-primary-400" },
@@ -126,7 +134,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="text-right">
                     <p className={`font-semibold text-sm ${isSender ? "text-red-400" : "text-primary-400"}`}>
-                      {isSender ? "-" : "+"}{formatCurrency(tx.amount)}
+                      {isSender ? "-" : "+"}{formatCurrency(tx.amount, configCurrency)}
                     </p>
                     <p className="text-xs text-gray-500">{formatDate(tx.createdAt)}</p>
                   </div>
