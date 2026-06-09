@@ -57,6 +57,28 @@ export default function LoginPage() {
     }
   }
 
+  async function handleResendOtp() {
+    setLoading(true);
+    setError("");
+    try {
+      const otpRes = await fetch("/api/auth/otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: authEmail, type: "login" }),
+      });
+
+      if (!otpRes.ok) {
+        throw new Error("Failed to send OTP");
+      }
+      
+      // We could add a toast or success message here if desired
+    } catch (err) {
+      setError("Failed to resend verification code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleOtpSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -158,8 +180,17 @@ export default function LoginPage() {
           
           <button 
             type="button" 
+            onClick={handleResendOtp}
+            disabled={loading}
+            className="w-full text-center text-sm text-primary-500 hover:text-primary-400 mt-4 font-medium"
+          >
+            Didn't receive code? Resend
+          </button>
+          
+          <button 
+            type="button" 
             onClick={() => setStep("credentials")}
-            className="w-full text-center text-sm text-gray-400 hover:text-white mt-4"
+            className="w-full text-center text-sm text-gray-400 hover:text-white mt-2"
           >
             ← Back to login
           </button>

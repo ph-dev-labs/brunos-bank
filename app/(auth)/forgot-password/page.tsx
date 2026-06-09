@@ -35,6 +35,27 @@ export default function ForgotPasswordPage() {
     }
   }
 
+  async function handleResendOtp() {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to resend reset code");
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleOtpSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStep("reset");
@@ -131,6 +152,15 @@ export default function ForgotPasswordPage() {
 
           <button type="submit" className="btn-primary w-full mt-2">
             Verify Code
+          </button>
+          
+          <button 
+            type="button" 
+            onClick={handleResendOtp}
+            disabled={loading}
+            className="w-full text-center text-sm text-primary-500 hover:text-primary-400 mt-4 font-medium"
+          >
+            Didn't receive code? Resend
           </button>
         </form>
       )}
