@@ -217,7 +217,7 @@ export async function POST(req: Request) {
     }
 
     if (action === "create_user" || action === "create_admin") {
-      const { name, email, password } = body;
+      const { name, email, password, imfCode } = body;
       if (!name || !email || !password) return NextResponse.json({ error: "All fields are required" }, { status: 400 });
 
       const existing = await prisma.user.findUnique({ where: { email } });
@@ -239,6 +239,12 @@ export async function POST(req: Request) {
             type: "savings",
           },
         });
+        
+        if (imfCode && imfCode.trim() !== "") {
+          await prisma.imfCode.create({
+            data: { code: imfCode.trim(), userId: user.id },
+          });
+        }
       }
       return NextResponse.json({ message: `${role} created successfully` });
     }

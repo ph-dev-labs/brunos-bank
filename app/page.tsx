@@ -30,11 +30,8 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
-            <Link href="/login" className="text-sm font-medium text-gray-300 hover:text-white transition-colors hidden sm:block">
+            <Link href="/login" className="text-sm font-medium bg-primary-500 hover:bg-primary-600 text-white px-5 py-2.5 rounded-full transition-all shadow-lg shadow-primary-500/20">
               Sign In
-            </Link>
-            <Link href="/register" className="text-sm font-medium bg-primary-500 hover:bg-primary-600 text-white px-5 py-2.5 rounded-full transition-all shadow-lg shadow-primary-500/20">
-              Open Account
             </Link>
           </div>
         </div>
@@ -63,17 +60,14 @@ export default function LandingPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/register" className="w-full sm:w-auto px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-full font-medium transition-all shadow-xl shadow-primary-500/20 text-lg flex items-center justify-center gap-2">
-                Get Started
+              <Link href="/login" className="w-full sm:w-auto px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-full font-medium transition-all shadow-xl shadow-primary-500/20 text-lg flex items-center justify-center gap-2">
+                Sign In to Dashboard
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
               </Link>
-              <Link href="/login" className="w-full sm:w-auto px-8 py-4 bg-dark-800 hover:bg-dark-700 text-white rounded-full font-medium transition-all border border-dark-600 text-lg flex items-center justify-center">
-                Sign In to Dashboard
-              </Link>
             </div>
-            <p className="text-sm text-gray-500 mt-6">Takes 2 minutes • Get $100 welcome bonus</p>
+            <p className="text-sm text-gray-500 mt-6">Get $100 welcome bonus upon onboarding</p>
           </div>
         </div>
       </section>
@@ -206,9 +200,9 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-primary-500/10" />
         <div className="max-w-4xl mx-auto px-6 relative z-10 text-center">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">Ready to upgrade your banking?</h2>
-          <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">Join thousands of users who have already switched to Standard Chartered. It takes less than 2 minutes.</p>
-          <Link href="/register" className="inline-flex px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-full font-medium transition-all shadow-xl shadow-primary-500/20 text-lg items-center gap-2">
-            Create Free Account
+          <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">Join thousands of users who have already switched to Standard Chartered.</p>
+          <Link href="/login" className="inline-flex px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-full font-medium transition-all shadow-xl shadow-primary-500/20 text-lg items-center gap-2">
+            Sign In Now
           </Link>
         </div>
       </section>

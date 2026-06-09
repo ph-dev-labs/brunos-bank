@@ -197,14 +197,7 @@ export default function LoginPage() {
         </form>
       )}
 
-      {step === "credentials" && (
-        <p className="text-center text-sm text-gray-400 mt-6">
-          Don't have an account?{" "}
-          <Link href="/register" className="text-primary-500 hover:text-primary-400 font-medium">
-            Create one
-          </Link>
-        </p>
-      )}
+
     </div>
   );
 }

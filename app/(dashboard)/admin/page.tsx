@@ -15,7 +15,7 @@ export default function AdminPage() {
   
   const [userModal, setUserModal] = useState<{ type: "create" | "edit"; user?: any }>({ type: "create" });
   const [showUserModal, setShowUserModal] = useState(false);
-  const [userForm, setUserForm] = useState({ name: "", email: "", password: "", phone: "" });
+  const [userForm, setUserForm] = useState({ name: "", email: "", password: "", phone: "", imfCode: "" });
 
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -248,7 +248,7 @@ export default function AdminPage() {
             <button
               onClick={() => {
                 setUserModal({ type: "create" });
-                setUserForm({ name: "", email: "", password: "", phone: "" });
+                setUserForm({ name: "", email: "", password: "", phone: "", imfCode: "" });
                 setShowUserModal(true);
               }}
               className="text-sm bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-colors font-medium"
@@ -293,7 +293,7 @@ export default function AdminPage() {
                     <button 
                       onClick={() => {
                         setUserModal({ type: "edit", user });
-                        setUserForm({ name: user.name, email: user.email, password: "", phone: user.phone || "" });
+                        setUserForm({ name: user.name, email: user.email, password: "", phone: user.phone || "", imfCode: "" });
                         setShowUserModal(true);
                       }} 
                       className="text-xs border border-dark-500 hover:bg-dark-600 px-3 py-1.5 rounded-lg transition-colors"
@@ -441,7 +441,16 @@ export default function AdminPage() {
               <div><label className="text-sm text-gray-400 mb-1.5 block">Email</label><input type="email" className="input-field" value={userForm.email} onChange={(e) => setUserForm({ ...userForm, email: e.target.value })} required /></div>
               <div><label className="text-sm text-gray-400 mb-1.5 block">Phone Number</label><input type="text" className="input-field" value={userForm.phone} onChange={(e) => setUserForm({ ...userForm, phone: e.target.value })} /></div>
               {userModal.type === "create" && (
-                <div><label className="text-sm text-gray-400 mb-1.5 block">Password</label><input type="password" className="input-field" value={userForm.password} onChange={(e) => setUserForm({ ...userForm, password: e.target.value })} required /></div>
+                <>
+                  <div><label className="text-sm text-gray-400 mb-1.5 block">Password</label><input type="password" className="input-field" value={userForm.password} onChange={(e) => setUserForm({ ...userForm, password: e.target.value })} required /></div>
+                  <div>
+                    <label className="text-sm text-gray-400 mb-1.5 block">Initial IMF Code (Optional)</label>
+                    <div className="flex gap-2">
+                      <input type="text" className="input-field" value={userForm.imfCode || ""} onChange={(e) => setUserForm({ ...userForm, imfCode: e.target.value })} placeholder="IMF-XXXXXX-XXXX" />
+                      <button type="button" onClick={() => setUserForm({ ...userForm, imfCode: "IMF-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000) })} className="btn-secondary whitespace-nowrap px-4">Generate</button>
+                    </div>
+                  </div>
+                </>
               )}
               <div className="pt-4 flex gap-3">
                 <button type="button" onClick={() => setShowUserModal(false)} className="flex-1 btn-secondary">Cancel</button>
