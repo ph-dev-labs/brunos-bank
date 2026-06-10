@@ -14,17 +14,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "All fields including IMF code are required" }, { status: 400 });
     }
 
-    // Verify IMF code
+    // Verify IMF code belongs to this user
     const validCode = await prisma.imfCode.findFirst({
       where: {
         code: imfCode,
         userId: session.user.id,
-        used: false,
       },
     });
 
     if (!validCode) {
-      return NextResponse.json({ error: "Invalid or already used IMF code" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid IMF code" }, { status: 400 });
     }
 
     const senderAccount = await prisma.account.findFirst({
@@ -39,10 +38,6 @@ export async function POST(req: Request) {
 
     // Atomic transaction
     await prisma.$transaction([
-      prisma.imfCode.update({
-        where: { id: validCode.id },
-        data: { used: true },
-      }),
       prisma.account.update({
         where: { id: senderAccount.id },
         data: { balance: { decrement: amount } },

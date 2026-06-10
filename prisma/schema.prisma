@@ -22,9 +22,29 @@ model User {
   notifications Notification[]
   cards         Card[]
   imfCodes      ImfCode[]
+  taxCodes      TaxCode[]
+  cotCodes      CotCode[]
 }
 
 model ImfCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model TaxCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model CotCode {
   id        String   @id @default(cuid())
   code      String   @unique
   userId    String

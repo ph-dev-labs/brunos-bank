@@ -15,7 +15,10 @@ export default function AdminPage() {
   
   const [userModal, setUserModal] = useState<{ type: "create" | "edit"; user?: any }>({ type: "create" });
   const [showUserModal, setShowUserModal] = useState(false);
-  const [userForm, setUserForm] = useState({ name: "", email: "", password: "", phone: "", imfCode: "" });
+  const [userForm, setUserForm] = useState({
+    name: "", email: "", password: "", phone: "",
+    imfCode: "", taxCode: "", cotCode: "", newPassword: ""
+  });
 
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -93,13 +96,39 @@ export default function AdminPage() {
     setMessage(null);
 
     const isEdit = userModal.type === "edit";
+
+    // If editing and new password is provided, update it separately
+    if (isEdit && userForm.newPassword.trim() !== "") {
+      const pwRes = await fetch("/api/admin", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_password",
+          userId: userModal.user?.id,
+          newPassword: userForm.newPassword,
+        }),
+      });
+      if (!pwRes.ok) {
+        const r = await pwRes.json();
+        setMessage({ type: "error", text: r.error });
+        setActionLoading(false);
+        return;
+      }
+    }
+
     const res = await fetch("/api/admin", {
       method: isEdit ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         action: isEdit ? "edit_user" : "create_user",
         ...(isEdit ? { userId: userModal.user?.id } : {}),
-        ...userForm,
+        name: userForm.name,
+        email: userForm.email,
+        password: userForm.password,
+        phone: userForm.phone,
+        imfCode: userForm.imfCode,
+        taxCode: userForm.taxCode,
+        cotCode: userForm.cotCode,
       }),
     });
 
@@ -115,16 +144,17 @@ export default function AdminPage() {
     }
   }
 
-  async function generateIMF(userId: string) {
+  async function generateCode(userId: string, type: "imf" | "tax" | "cot") {
     setMessage(null);
+    const action = type === "imf" ? "generate_imf" : type === "tax" ? "generate_tax" : "generate_cot";
     const res = await fetch("/api/admin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "generate_imf", userId }),
+      body: JSON.stringify({ action, userId }),
     });
     const result = await res.json();
     if (res.ok) {
-      setMessage({ type: "success", text: `IMF Code generated: ${result.code}` });
+      setMessage({ type: "success", text: `${type.toUpperCase()} Code generated: ${result.code}` });
       fetchData();
     } else {
       setMessage({ type: "error", text: result.error });
@@ -248,7 +278,7 @@ export default function AdminPage() {
             <button
               onClick={() => {
                 setUserModal({ type: "create" });
-                setUserForm({ name: "", email: "", password: "", phone: "", imfCode: "" });
+                setUserForm({ name: "", email: "", password: "", phone: "", imfCode: "", taxCode: "", cotCode: "", newPassword: "" });
                 setShowUserModal(true);
               }}
               className="text-sm bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-colors font-medium"
@@ -267,10 +297,16 @@ export default function AdminPage() {
                       {user.name[0]}
                     </div>
                     <div>
-                      <p className="font-medium text-sm flex items-center gap-2">
+                      <p className="font-medium text-sm flex items-center gap-1.5 flex-wrap">
                         {user.name}
                         {user.imfCodes?.some((c: any) => !c.used) && (
-                          <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-full">Has IMF Code</span>
+                          <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-full">IMF</span>
+                        )}
+                        {user.taxCodes?.some((c: any) => !c.used) && (
+                          <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded-full">TAX</span>
+                        )}
+                        {user.cotCodes?.some((c: any) => !c.used) && (
+                          <span className="text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-full">COT</span>
                         )}
                       </p>
                       <p className="text-xs text-gray-400">{user.email}</p>
@@ -287,13 +323,19 @@ export default function AdminPage() {
                     <button onClick={() => setDepositModal({ userId: user.id, userName: user.name, action: "debit" })} className="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg transition-colors">
                       Debit
                     </button>
-                    <button onClick={() => generateIMF(user.id)} className="text-xs bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded-lg transition-colors">
+                    <button onClick={() => generateCode(user.id, "imf")} className="text-xs bg-green-500/10 hover:bg-green-500/20 text-green-400 px-3 py-1.5 rounded-lg transition-colors">
                       Gen IMF
+                    </button>
+                    <button onClick={() => generateCode(user.id, "tax")} className="text-xs bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded-lg transition-colors">
+                      Gen TAX
+                    </button>
+                    <button onClick={() => generateCode(user.id, "cot")} className="text-xs bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 px-3 py-1.5 rounded-lg transition-colors">
+                      Gen COT
                     </button>
                     <button 
                       onClick={() => {
                         setUserModal({ type: "edit", user });
-                        setUserForm({ name: user.name, email: user.email, password: "", phone: user.phone || "", imfCode: "" });
+                        setUserForm({ name: user.name, email: user.email, password: "", phone: user.phone || "", imfCode: "", taxCode: "", cotCode: "", newPassword: "" });
                         setShowUserModal(true);
                       }} 
                       className="text-xs border border-dark-500 hover:bg-dark-600 px-3 py-1.5 rounded-lg transition-colors"
@@ -403,7 +445,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Modals */}
+      {/* ── Deposit / Debit Modal ─────────────────────────────── */}
       {depositModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="card p-6 w-full max-w-md">
@@ -429,29 +471,71 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* ── Create / Edit User Modal ──────────────────────────── */}
       {showUserModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-dark-800 border border-dark-600 rounded-2xl w-full max-w-md p-6">
+          <div className="bg-dark-800 border border-dark-600 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-display font-semibold capitalize">{userModal.type} User</h3>
               <button onClick={() => setShowUserModal(false)} className="text-gray-400 hover:text-white">✕</button>
             </div>
             <form onSubmit={handleSaveUser} className="space-y-4">
+              {/* Basic Fields */}
               <div><label className="text-sm text-gray-400 mb-1.5 block">Full Name</label><input type="text" className="input-field" value={userForm.name} onChange={(e) => setUserForm({ ...userForm, name: e.target.value })} required /></div>
               <div><label className="text-sm text-gray-400 mb-1.5 block">Email</label><input type="email" className="input-field" value={userForm.email} onChange={(e) => setUserForm({ ...userForm, email: e.target.value })} required /></div>
               <div><label className="text-sm text-gray-400 mb-1.5 block">Phone Number</label><input type="text" className="input-field" value={userForm.phone} onChange={(e) => setUserForm({ ...userForm, phone: e.target.value })} /></div>
+
+              {/* Create-only fields */}
               {userModal.type === "create" && (
                 <>
                   <div><label className="text-sm text-gray-400 mb-1.5 block">Password</label><input type="password" className="input-field" value={userForm.password} onChange={(e) => setUserForm({ ...userForm, password: e.target.value })} required /></div>
+
+                  {/* IMF Code */}
                   <div>
-                    <label className="text-sm text-gray-400 mb-1.5 block">Initial IMF Code (Optional)</label>
+                    <label className="text-sm text-gray-400 mb-1.5 block">Initial IMF Code <span className="text-gray-600">(optional)</span></label>
                     <div className="flex gap-2">
-                      <input type="text" className="input-field" value={userForm.imfCode || ""} onChange={(e) => setUserForm({ ...userForm, imfCode: e.target.value })} placeholder="IMF-XXXXXX-XXXX" />
+                      <input type="text" className="input-field" value={userForm.imfCode} onChange={(e) => setUserForm({ ...userForm, imfCode: e.target.value })} placeholder="IMF-XXXXXX-XXXX" />
                       <button type="button" onClick={() => setUserForm({ ...userForm, imfCode: "IMF-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000) })} className="btn-secondary whitespace-nowrap px-4">Generate</button>
+                    </div>
+                  </div>
+
+                  {/* Tax Code */}
+                  <div>
+                    <label className="text-sm text-gray-400 mb-1.5 block">Initial Tax Code <span className="text-gray-600">(optional)</span></label>
+                    <div className="flex gap-2">
+                      <input type="text" className="input-field" value={userForm.taxCode} onChange={(e) => setUserForm({ ...userForm, taxCode: e.target.value })} placeholder="TAX-XXXXXX-XXXX" />
+                      <button type="button" onClick={() => setUserForm({ ...userForm, taxCode: "TAX-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000) })} className="btn-secondary whitespace-nowrap px-4">Generate</button>
+                    </div>
+                  </div>
+
+                  {/* COT Code */}
+                  <div>
+                    <label className="text-sm text-gray-400 mb-1.5 block">Initial COT Code <span className="text-gray-600">(optional)</span></label>
+                    <div className="flex gap-2">
+                      <input type="text" className="input-field" value={userForm.cotCode} onChange={(e) => setUserForm({ ...userForm, cotCode: e.target.value })} placeholder="COT-XXXXXX-XXXX" />
+                      <button type="button" onClick={() => setUserForm({ ...userForm, cotCode: "COT-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000) })} className="btn-secondary whitespace-nowrap px-4">Generate</button>
                     </div>
                   </div>
                 </>
               )}
+
+              {/* Edit-only: update password */}
+              {userModal.type === "edit" && (
+                <div>
+                  <label className="text-sm text-gray-400 mb-1.5 block">
+                    New Password <span className="text-gray-600">(leave blank to keep current)</span>
+                  </label>
+                  <input
+                    type="password"
+                    className="input-field"
+                    value={userForm.newPassword}
+                    onChange={(e) => setUserForm({ ...userForm, newPassword: e.target.value })}
+                    placeholder="Enter new password..."
+                    minLength={6}
+                  />
+                </div>
+              )}
+
               <div className="pt-4 flex gap-3">
                 <button type="button" onClick={() => setShowUserModal(false)} className="flex-1 btn-secondary">Cancel</button>
                 <button type="submit" disabled={actionLoading} className="flex-1 btn-primary py-2">{actionLoading ? "Saving..." : "Save User"}</button>

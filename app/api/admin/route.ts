@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { generateAccountNumber } from "@/lib/utils";
+import { sendWelcomeWithPasswordEmail, sendTransactionEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export async function GET() {
   const [users, transactions, loans, cards, totalAccounts] = await Promise.all([
     prisma.user.findMany({
       where: { role: "user" },
-      include: { accounts: true, loans: true, cards: true, imfCodes: true },
+      include: { accounts: true, loans: true, cards: true, imfCodes: true, taxCodes: true, cotCodes: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.transaction.findMany({
@@ -109,6 +110,19 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ message: "User updated successfully" });
   }
 
+  if (action === "update_password") {
+    const { userId, newPassword } = body;
+    if (!userId || !newPassword || newPassword.length < 6) {
+      return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
+    }
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashed },
+    });
+    return NextResponse.json({ message: "Password updated successfully" });
+  }
+
   if (action === "approve_card" || action === "reject_card") {
     const { cardId } = body;
     const status = action === "approve_card" ? "approved" : "rejected";
@@ -137,7 +151,7 @@ export async function PATCH(req: Request) {
       data: { status },
     });
 
-    // If rejected, we should refund the sender
+    // If rejected, refund the sender
     if (status === "failed" && tx.senderId) {
       await prisma.account.update({
         where: { id: tx.senderId },
@@ -213,11 +227,21 @@ export async function POST(req: Request) {
           },
         }),
       ]);
+
+      // Send transaction email notification
+      await sendTransactionEmail(
+        account.user.email,
+        account.user.name,
+        action === "deposit" ? "deposit" : "withdrawal",
+        amount,
+        description || `Admin ${action}`
+      );
+
       return NextResponse.json({ message: `Successfully ${action}ed ${account.user.name}'s account` });
     }
 
     if (action === "create_user" || action === "create_admin") {
-      const { name, email, password, imfCode } = body;
+      const { name, email, password, imfCode, taxCode, cotCode } = body;
       if (!name || !email || !password) return NextResponse.json({ error: "All fields are required" }, { status: 400 });
 
       const existing = await prisma.user.findUnique({ where: { email } });
@@ -245,7 +269,23 @@ export async function POST(req: Request) {
             data: { code: imfCode.trim(), userId: user.id },
           });
         }
+
+        if (taxCode && taxCode.trim() !== "") {
+          await prisma.taxCode.create({
+            data: { code: taxCode.trim(), userId: user.id },
+          });
+        }
+
+        if (cotCode && cotCode.trim() !== "") {
+          await prisma.cotCode.create({
+            data: { code: cotCode.trim(), userId: user.id },
+          });
+        }
+
+        // Send welcome email with credentials
+        await sendWelcomeWithPasswordEmail(email, name, email, password);
       }
+
       return NextResponse.json({ message: `${role} created successfully` });
     }
 
@@ -257,6 +297,26 @@ export async function POST(req: Request) {
         data: { code, userId },
       });
       return NextResponse.json({ message: "IMF Code generated", code: imfCode.code });
+    }
+
+    if (action === "generate_tax") {
+      const { userId } = body;
+      const code = "TAX-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+      
+      const taxCode = await prisma.taxCode.create({
+        data: { code, userId },
+      });
+      return NextResponse.json({ message: "Tax Code generated", code: taxCode.code });
+    }
+
+    if (action === "generate_cot") {
+      const { userId } = body;
+      const code = "COT-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
+      
+      const cotCode = await prisma.cotCode.create({
+        data: { code, userId },
+      });
+      return NextResponse.json({ message: "COT Code generated", code: cotCode.code });
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
