@@ -2,12 +2,14 @@
 import { useEffect, useState } from "react";
 import { formatDate } from "@/lib/utils";
 import { useCurrency } from "@/components/CurrencyProvider";
+import InvoiceModal from "@/components/InvoiceModal";
 
 export default function TransactionsPage() {
   const { formatCurrency } = useCurrency();
   const [data, setData] = useState<any>(null);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [selectedTx, setSelectedTx] = useState<any>(null);
 
   useEffect(() => {
     fetch("/api/transactions")
@@ -30,6 +32,9 @@ export default function TransactionsPage() {
 
   return (
     <div className="space-y-6">
+      {selectedTx && (
+        <InvoiceModal transaction={selectedTx} onClose={() => setSelectedTx(null)} />
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-display font-bold">Transactions</h1>
@@ -91,11 +96,20 @@ export default function TransactionsPage() {
                   <p className="text-xs text-gray-500">{formatDate(tx.createdAt)}</p>
                 </div>
 
-                <div className="text-right shrink-0">
+                <div className="text-right shrink-0 flex flex-col items-end gap-1">
                   <p className={`font-semibold ${tx.type === "deposit" || !isSender ? "text-primary-400" : "text-red-400"}`}>
                     {tx.type === "deposit" || !isSender ? "+" : "-"}{formatCurrency(tx.amount)}
                   </p>
-                  <span className={badgeClass}>{tx.status}</span>
+                  <div className="flex items-center gap-2">
+                    <span className={badgeClass}>{tx.status}</span>
+                    <button 
+                      onClick={() => setSelectedTx(tx)} 
+                      className="text-xs flex items-center gap-1 text-gray-500 hover:text-primary-400 bg-dark-700 hover:bg-dark-600 px-2 py-1 rounded transition-colors"
+                      title="View Receipt"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">receipt_long</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             );

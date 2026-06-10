@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useCurrency } from "@/components/CurrencyProvider";
+import InvoiceModal from "@/components/InvoiceModal";
 
 // ─── Step config ──────────────────────────────────────────────────────────────
 const EXT_STEPS = [
@@ -27,10 +28,14 @@ export default function TransferPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  const [extSimulating, setExtSimulating] = useState(false);
+  const [completedTx, setCompletedTx] = useState<any>(null);
+
   function resetExternal() {
     setExtStep(1);
     setExtForm({ externalBank: "", externalAccountName: "", externalAccountNumber: "", amount: "", description: "", imfCode: "", taxCode: "", cotCode: "" });
     setMessage(null);
+    setCompletedTx(null);
   }
 
   // ── Internal submit ──────────────────────────────────────────────────────────
@@ -60,6 +65,17 @@ export default function TransferPage() {
   function handleExtNext(e: React.FormEvent) {
     e.preventDefault();
     setMessage(null);
+
+    // Simulate contacting bank after step 1
+    if (extStep === 1) {
+      setExtSimulating(true);
+      setTimeout(() => {
+        setExtSimulating(false);
+        setExtStep(2);
+      }, 2500);
+      return;
+    }
+
     if (extStep < 4) { setExtStep(extStep + 1); return; }
     handleExternalSubmit();
   }
@@ -79,7 +95,7 @@ export default function TransferPage() {
 
     if (res.ok) {
       setMessage({ type: "success", text: data.message });
-      resetExternal();
+      setCompletedTx(data.transaction);
     } else {
       setMessage({ type: "error", text: data.error || "Transfer failed" });
     }
@@ -114,6 +130,9 @@ export default function TransferPage() {
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
+      {completedTx && (
+        <InvoiceModal transaction={completedTx} onClose={resetExternal} />
+      )}
       <div>
         <h1 className="text-2xl font-display font-bold">Send Money</h1>
         <p className="text-gray-400 text-sm mt-1">Transfer funds securely</p>
@@ -290,13 +309,13 @@ export default function TransferPage() {
 
             {/* Navigation buttons */}
             <div className="flex gap-3 pt-2">
-              {extStep > 1 && (
+              {extStep > 1 && !extSimulating && (
                 <button type="button" onClick={() => { setExtStep(extStep - 1); setMessage(null); }} className="btn-secondary flex-1">
                   Back
                 </button>
               )}
-              <button type="submit" className="btn-primary flex-1" disabled={loading}>
-                {loading ? "Authorizing..." : extStep === 4 ? "Authorize Transfer" : "Continue →"}
+              <button type="submit" className="btn-primary flex-1" disabled={loading || extSimulating}>
+                {loading ? "Authorizing..." : extSimulating ? "Connecting to Bank..." : extStep === 4 ? "Authorize Transfer" : "Continue →"}
               </button>
             </div>
           </form>

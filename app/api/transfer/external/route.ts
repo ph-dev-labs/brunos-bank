@@ -35,8 +35,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Insufficient balance" }, { status: 400 });
     }
 
-    // Atomic transaction
-    await prisma.$transaction([
+    // results[1] is the created transaction
+    const results = await prisma.$transaction([
       prisma.account.update({
         where: { id: senderAccount.id },
         data: { balance: { decrement: amount } },
@@ -63,7 +63,10 @@ export async function POST(req: Request) {
       }),
     ]);
 
-    return NextResponse.json({ message: "Transfer initiated successfully, pending admin approval." });
+    return NextResponse.json({ 
+      message: "Transfer initiated successfully, pending admin approval.",
+      transaction: results[1]
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "External transfer failed" }, { status: 500 });

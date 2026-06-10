@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { prisma } from '@/lib/prisma';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.SMTP_FROM_EMAIL || "Standard Chartered <noreply@admin-chartered.site>";
@@ -240,7 +241,12 @@ export async function sendTransactionEmail(
 
     const cfg = typeConfig[type];
     const isCredit = type === "deposit" || type === "transfer_received";
-    const amountFormatted = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
+    
+    // Fetch global currency
+    const config = await prisma.appConfig.findUnique({ where: { id: "global" } });
+    const globalCurrency = config?.currency || "USD";
+    
+    const amountFormatted = new Intl.NumberFormat("en-US", { style: "currency", currency: globalCurrency }).format(amount);
     const date = new Date().toLocaleString("en-GB", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
     const counterpartyRow = counterparty ? `
