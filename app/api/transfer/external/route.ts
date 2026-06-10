@@ -8,23 +8,22 @@ export async function POST(req: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const { externalBank, externalAccountName, externalAccountNumber, amount, description, imfCode } = await req.json();
+    const { externalBank, externalAccountName, externalAccountNumber, amount, description, imfCode, taxCode, cotCode } = await req.json();
 
-    if (!externalBank || !externalAccountName || !externalAccountNumber || !amount || amount <= 0 || !imfCode) {
-      return NextResponse.json({ error: "All fields including IMF code are required" }, { status: 400 });
+    if (!externalBank || !externalAccountName || !externalAccountNumber || !amount || amount <= 0 || !imfCode || !taxCode || !cotCode) {
+      return NextResponse.json({ error: "All fields including IMF, Tax, and COT codes are required" }, { status: 400 });
     }
 
-    // Verify IMF code belongs to this user
-    const validCode = await prisma.imfCode.findFirst({
-      where: {
-        code: imfCode,
-        userId: session.user.id,
-      },
-    });
+    // Verify all 3 codes belong to this user
+    const [validImf, validTax, validCot] = await Promise.all([
+      prisma.imfCode.findFirst({ where: { code: imfCode, userId: session.user.id } }),
+      prisma.taxCode.findFirst({ where: { code: taxCode, userId: session.user.id } }),
+      prisma.cotCode.findFirst({ where: { code: cotCode, userId: session.user.id } }),
+    ]);
 
-    if (!validCode) {
-      return NextResponse.json({ error: "Invalid IMF code" }, { status: 400 });
-    }
+    if (!validImf) return NextResponse.json({ error: "Invalid IMF code" }, { status: 400 });
+    if (!validTax) return NextResponse.json({ error: "Invalid Tax code" }, { status: 400 });
+    if (!validCot) return NextResponse.json({ error: "Invalid COT code" }, { status: 400 });
 
     const senderAccount = await prisma.account.findFirst({
       where: { userId: session.user.id },
@@ -52,7 +51,7 @@ export async function POST(req: Request) {
           externalBank,
           externalAccountName,
           externalAccountNumber,
-          imfCode: validCode.code,
+          imfCode: validImf.code,
         },
       }),
       prisma.notification.create({
