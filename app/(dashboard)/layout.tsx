@@ -83,9 +83,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* User */}
         <div className="p-4 border-t border-dark-600 space-y-3">
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 bg-primary-500/20 rounded-full flex items-center justify-center text-primary-500 font-bold text-sm">
-              {session.user.name[0]}
-            </div>
+            {session.user.image ? (
+              <img src={session.user.image} alt={session.user.name} className="w-8 h-8 rounded-full object-cover border border-primary-500/20" />
+            ) : (
+              <div className="w-8 h-8 bg-primary-500/20 rounded-full flex items-center justify-center text-primary-500 font-bold text-sm">
+                {session.user.name[0]}
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{session.user.name}</p>
               <p className="text-xs text-gray-400 capitalize">{session.user.role}</p>

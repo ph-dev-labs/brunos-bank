@@ -9,6 +9,7 @@ export default function ProfilePage() {
   const [profileForm, setProfileForm] = useState({ name: "", email: "", phone: "" });
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ type: "success" | "error", text: string } | null>(null);
+  const [imageUploading, setImageUploading] = useState(false);
 
   const [passwordForm, setPasswordForm] = useState({ current: "", new: "", confirm: "" });
   const [passwordSaving, setPasswordSaving] = useState(false);
@@ -52,6 +53,43 @@ export default function ProfilePage() {
     }
   }
 
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setProfileMsg({ type: "error", text: "Image size must be less than 5MB" });
+      return;
+    }
+
+    setImageUploading(true);
+    setProfileMsg(null);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch("/api/profile/image", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setProfileMsg({ type: "success", text: "Profile picture updated!" });
+        setUser({ ...user, image: data.user.image });
+        // Reload to update the session in the layout sidebar
+        window.location.reload();
+      } else {
+        setProfileMsg({ type: "error", text: data.error || "Failed to upload image" });
+      }
+    } catch (error) {
+      setProfileMsg({ type: "error", text: "Failed to upload image" });
+    } finally {
+      setImageUploading(false);
+    }
+  }
+
   async function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (passwordForm.new !== passwordForm.confirm) {
@@ -92,8 +130,18 @@ export default function ProfilePage() {
         {/* Personal Info */}
         <div className="card p-6">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-primary-500/20 rounded-full flex items-center justify-center text-primary-500 font-bold text-2xl">
-              {user?.name?.[0] || "U"}
+            <div className="relative group">
+              {user?.image ? (
+                <img src={user.image} alt={user.name} className="w-16 h-16 rounded-full object-cover border-2 border-primary-500/20" />
+              ) : (
+                <div className="w-16 h-16 bg-primary-500/20 rounded-full flex items-center justify-center text-primary-500 font-bold text-2xl">
+                  {user?.name?.[0] || "U"}
+                </div>
+              )}
+              <label className="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 group-hover:opacity-100 rounded-full cursor-pointer transition-opacity">
+                <span className="material-symbols-outlined text-[1.5rem]">{imageUploading ? "hourglass_empty" : "photo_camera"}</span>
+                <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={imageUploading} />
+              </label>
             </div>
             <div>
               <h2 className="font-display font-semibold text-lg">{user?.name}</h2>

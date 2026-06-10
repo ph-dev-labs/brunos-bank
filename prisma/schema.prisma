@@ -15,6 +15,7 @@ model User {
   password      String
   phone         String?
   role          String    @default("user") // "user" | "admin"
+  image         String?   @db.Text
   createdAt     DateTime  @default(now())
 
   accounts      Account[]
