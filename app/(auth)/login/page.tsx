@@ -6,9 +6,7 @@ import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"credentials" | "otp">("credentials");
-  const [form, setForm] = useState({ email: "", password: "", otp: "" });
-  const [authEmail, setAuthEmail] = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -36,72 +34,8 @@ export default function LoginPage() {
       return;
     }
 
-    // Credentials valid, now request OTP
-    try {
-      const otpRes = await fetch("/api/auth/otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, type: "login" }),
-      });
-
-      if (!otpRes.ok) {
-        throw new Error("Failed to send OTP");
-      }
-
-      setAuthEmail(form.email);
-      setStep("otp");
-    } catch (err) {
-      setError("Failed to send verification code. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleResendOtp() {
-    setLoading(true);
-    setError("");
-    try {
-      const otpRes = await fetch("/api/auth/otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: authEmail, type: "login" }),
-      });
-
-      if (!otpRes.ok) {
-        throw new Error("Failed to send OTP");
-      }
-      
-      // We could add a toast or success message here if desired
-    } catch (err) {
-      setError("Failed to resend verification code. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleOtpSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const res = await fetch("/api/auth/otp", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: authEmail, code: form.otp, type: "login" }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Invalid OTP");
-      }
-
-      // Re-trigger sign in but this time we actually complete it (we can't easily block NextAuth login natively without custom credentials logic, so we do this two-step approach)
-      router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Verification failed");
-      setLoading(false);
-    }
+    // Credentials valid, login is complete
+    router.push("/dashboard");
   }
 
   return (
@@ -113,10 +47,10 @@ export default function LoginPage() {
       </div>
 
       <h1 className="text-2xl font-display font-bold mb-1">
-        {step === "credentials" ? "Welcome back" : "Verification"}
+        Welcome back
       </h1>
       <p className="text-gray-400 text-sm mb-8">
-        {step === "credentials" ? "Sign in to your account" : `Enter the 6-digit code sent to ${authEmail}`}
+        Sign in to your account
       </p>
 
       {error && (
@@ -125,79 +59,39 @@ export default function LoginPage() {
         </div>
       )}
 
-      {step === "credentials" ? (
-        <form onSubmit={handleCredentialsSubmit} className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-400 mb-1.5 block">Email</label>
-            <input
-              type="email"
-              className="input-field"
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              required
-            />
+      <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+        <div>
+          <label className="text-sm text-gray-400 mb-1.5 block">Email</label>
+          <input
+            type="email"
+            className="input-field"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
+          />
+        </div>
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-sm text-gray-400 block">Password</label>
+            <Link href="/forgot-password" className="text-xs text-primary-500 hover:text-primary-400">
+              Forgot password?
+            </Link>
           </div>
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-sm text-gray-400 block">Password</label>
-              <Link href="/forgot-password" className="text-xs text-primary-500 hover:text-primary-400">
-                Forgot password?
-              </Link>
-            </div>
-            <input
-              type="password"
-              className="input-field"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              required
-            />
-          </div>
+          <input
+            type="password"
+            className="input-field"
+            placeholder="••••••••"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required
+          />
+        </div>
 
-          <button type="submit" className="btn-primary w-full mt-2" disabled={loading}>
-            {loading ? "Verifying..." : "Continue"}
-          </button>
-        </form>
-      ) : (
-        <form onSubmit={handleOtpSubmit} className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-400 mb-1.5 block">6-Digit Code</label>
-            <input
-              type="text"
-              className="input-field font-mono text-center tracking-widest text-lg"
-              placeholder="000000"
-              maxLength={6}
-              value={form.otp}
-              onChange={(e) => setForm({ ...form, otp: e.target.value })}
-              required
-            />
-          </div>
-
-          <button type="submit" className="btn-primary w-full mt-2" disabled={loading}>
-            {loading ? "Verifying..." : "Sign In"}
-          </button>
-          
-          <button 
-            type="button" 
-            onClick={handleResendOtp}
-            disabled={loading}
-            className="w-full text-center text-sm text-primary-500 hover:text-primary-400 mt-4 font-medium"
-          >
-            Didn't receive code? Resend
-          </button>
-          
-          <button 
-            type="button" 
-            onClick={() => setStep("credentials")}
-            className="w-full text-center text-sm text-gray-400 hover:text-white mt-2"
-          >
-            ← Back to login
-          </button>
-        </form>
-      )}
-
-
+        <button type="submit" className="btn-primary w-full mt-2" disabled={loading}>
+          {loading ? "Verifying..." : "Sign In"}
+        </button>
+      </form>
     </div>
   );
 }
