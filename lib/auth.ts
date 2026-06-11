@@ -28,7 +28,6 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           email: user.email,
           role: user.role,
-          image: user.image,
         };
       },
     }),
@@ -41,6 +40,8 @@ export const authOptions: NextAuthOptions = {
         // We do not store the image in the token because base64 image data
         // will exceed the cookie size limit and cause 494 REQUEST_HEADER_TOO_LARGE.
       }
+      delete token.picture;
+      delete token.image;
       return token;
     },
     async session({ session, token }) {
