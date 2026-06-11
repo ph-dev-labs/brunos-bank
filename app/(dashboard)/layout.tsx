@@ -21,6 +21,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetch("/api/profile")
+        .then(res => res.json())
+        .then(data => {
+          if (data.user?.image) {
+            setProfileImage(data.user.image);
+          }
+        })
+        .catch(console.error);
+    }
+  }, [status]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -83,8 +97,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* User */}
         <div className="p-4 border-t border-dark-600 space-y-3">
           <div className="flex items-center gap-3 px-3 py-2">
-            {session.user.image ? (
-              <img src={session.user.image} alt={session.user.name} className="w-8 h-8 rounded-full object-cover border border-primary-500/20" />
+            {profileImage ? (
+              <img src={profileImage} alt={session.user.name} className="w-8 h-8 rounded-full object-cover border border-primary-500/20" />
             ) : (
               <div className="w-8 h-8 bg-primary-500/20 rounded-full flex items-center justify-center text-primary-500 font-bold text-sm">
                 {session.user.name[0]}
