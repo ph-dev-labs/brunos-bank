@@ -12,7 +12,7 @@ export default function TermsPage() {
 
         <h2 className="text-2xl font-semibold mb-4 mt-8">2. Description of Service</h2>
         <p className="text-gray-400 mb-6">
-          Standard Chartered provides digital banking services, including but not limited to, savings accounts, money transfers, virtual cards, and loan facilities. We reserve the right to modify or discontinue any part of the service at any time.
+          Strantchar provides digital banking services, including but not limited to, savings accounts, money transfers, virtual cards, and loan facilities. We reserve the right to modify or discontinue any part of the service at any time.
         </p>
 
         <h2 className="text-2xl font-semibold mb-4 mt-8">3. User Obligations</h2>
@@ -22,7 +22,7 @@ export default function TermsPage() {
 
         <h2 className="text-2xl font-semibold mb-4 mt-8">4. Limitation of Liability</h2>
         <p className="text-gray-400 mb-6">
-          In no event shall Standard Chartered be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or relating to your use of the service.
+          In no event shall Strantchar be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or relating to your use of the service.
         </p>
       </div>
     </div>

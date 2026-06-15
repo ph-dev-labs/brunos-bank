@@ -39,7 +39,7 @@ export default async function CardsPage() {
                   </div>
                 )}
                 <div className="flex justify-between items-start">
-                  <span className="font-display font-bold text-lg">Standard Chartered</span>
+                  <span className="font-display font-bold text-lg">Strantchar</span>
                   <span className="text-sm capitalize bg-white/10 px-2 py-0.5 rounded">{card.type}</span>
                 </div>
                 <div className="mt-8">

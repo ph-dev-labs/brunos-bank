@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const syne = Syne({ subsets: ["latin"], variable: "--font-syne" });
 
 export const metadata: Metadata = {
-  title: "Standard Chartered — Modern Banking",
+  title: "Strantchar — Modern Banking",
   description: "A secure, modern banking experience",
 };
 

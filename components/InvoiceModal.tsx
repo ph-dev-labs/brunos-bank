@@ -18,7 +18,7 @@ export default function InvoiceModal({ transaction, onClose }: { transaction: an
           <div className="flex justify-center mb-3">
             <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
           </div>
-          <h2 className="text-xl font-display font-bold text-white tracking-wide">Standard Chartered</h2>
+          <h2 className="text-xl font-display font-bold text-white tracking-wide">Strantchar</h2>
           <p className="text-gray-400 text-xs uppercase tracking-widest mt-1">Transaction Receipt</p>
         </div>
 

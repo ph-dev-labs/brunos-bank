@@ -43,7 +43,7 @@ export async function POST(req: Request) {
         notifications: {
           create: [
             {
-              title: "Welcome to Standard Chartered!",
+              title: "Welcome to Strantchar!",
               message: "Your account is ready. You have received a $100 welcome bonus!",
               read: false,
             },

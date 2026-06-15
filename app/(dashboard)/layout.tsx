@@ -67,8 +67,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Logo */}
         <div className="p-6 border-b border-dark-600">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="Standard Chartered" className="w-8 h-8 object-contain" />
-            <span className="font-display font-bold text-lg">Standard Chartered</span>
+            <img src="/logo.png" alt="Strantchar" className="w-8 h-8 object-contain" />
+            <span className="font-display font-bold text-lg">Strantchar</span>
           </div>
         </div>
 
@@ -136,8 +136,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="Standard Chartered" className="w-6 h-6 object-contain" />
-            <span className="font-display font-bold">Standard Chartered</span>
+            <img src="/logo.png" alt="Strantchar" className="w-6 h-6 object-contain" />
+            <span className="font-display font-bold">Strantchar</span>
           </div>
           <LanguageSwitcher />
         </div>

@@ -2,8 +2,8 @@ import { Resend } from 'resend';
 import { prisma } from '@/lib/prisma';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = process.env.SMTP_FROM_EMAIL || "Standard Chartered <noreply@admin-chartered.site>";
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.admin-chartered.site';
+const FROM = process.env.SMTP_FROM_EMAIL || "Strantchar <noreply@strantchar.com>";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.strantchar.com';
 
 // ─── Shared layout wrapper ────────────────────────────────────────────────────
 function layout(body: string): string {
@@ -12,7 +12,7 @@ function layout(body: string): string {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Standard Chartered</title>
+  <title>Strantchar</title>
 </head>
 <body style="margin:0;padding:0;background:#f4f4f4;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a1a1a;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:32px 16px;">
@@ -25,7 +25,7 @@ function layout(body: string): string {
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td>
-                  <p style="margin:0;color:#ffffff;font-size:18px;font-weight:700;letter-spacing:0.5px;">Standard Chartered</p>
+                  <p style="margin:0;color:#ffffff;font-size:18px;font-weight:700;letter-spacing:0.5px;">Strantchar</p>
                   <p style="margin:4px 0 0;color:#8fa8c8;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;">Private Banking</p>
                 </td>
                 <td align="right">
@@ -43,11 +43,11 @@ function layout(body: string): string {
         <tr>
           <td style="background:#f8f8f8;border-top:1px solid #e8e8e8;padding:24px 40px;">
             <p style="margin:0 0 8px;font-size:11px;color:#888888;line-height:1.6;">
-              This message was sent to you by Standard Chartered. If you did not request this communication or believe you received it in error, please disregard this email or contact our support team immediately.
+              This message was sent to you by Strantchar. If you did not request this communication or believe you received it in error, please disregard this email or contact our support team immediately.
             </p>
             <p style="margin:0;font-size:11px;color:#aaaaaa;">
-              &copy; ${new Date().getFullYear()} Standard Chartered. All rights reserved. &nbsp;|&nbsp;
-              <a href="${APP_URL}" style="color:#4a7ab5;text-decoration:none;">www.admin-chartered.site</a>
+              &copy; ${new Date().getFullYear()} Strantchar. All rights reserved. &nbsp;|&nbsp;
+              <a href="${APP_URL}" style="color:#4a7ab5;text-decoration:none;">www.strantchar.com</a>
             </p>
           </td>
         </tr>
@@ -76,7 +76,7 @@ export async function sendOtpEmail(to: string, code: string, name: string) {
         <p style="margin:0 0 20px;font-size:22px;font-weight:700;color:#0d2340;">Security Authentication</p>
         <p style="margin:0 0 24px;font-size:14px;color:#444444;line-height:1.7;">Dear ${name},</p>
         <p style="margin:0 0 28px;font-size:14px;color:#444444;line-height:1.7;">
-          We received a request to verify your identity on your Standard Chartered account.
+          We received a request to verify your identity on your Strantchar account.
           Please use the one-time code below to complete verification.
         </p>
         <table cellpadding="0" cellspacing="0" width="100%">
@@ -89,13 +89,13 @@ export async function sendOtpEmail(to: string, code: string, name: string) {
         </table>
         <p style="margin:0;font-size:13px;color:#888888;line-height:1.7;border-top:1px solid #eeeeee;padding-top:20px;">
           If you did not initiate this request, please contact our support team immediately and do not share this code with anyone.
-          Standard Chartered will never ask for your verification code.
+          Strantchar will never ask for your verification code.
         </p>
       </td></tr>`;
 
     await resend.emails.send({
       from: FROM, to,
-      subject: `Your Standard Chartered Verification Code: ${code}`,
+      subject: `Your Strantchar Verification Code: ${code}`,
       html: layout(body),
     });
   } catch (error) {
@@ -114,10 +114,10 @@ export async function sendWelcomeEmail(to: string, name: string) {
     const body = `
       <tr><td style="padding:36px 40px 32px;">
         <p style="margin:0 0 6px;font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:1px;">Account Confirmation</p>
-        <p style="margin:0 0 24px;font-size:22px;font-weight:700;color:#0d2340;">Welcome to Standard Chartered</p>
+        <p style="margin:0 0 24px;font-size:22px;font-weight:700;color:#0d2340;">Welcome to Strantchar</p>
         <p style="margin:0 0 20px;font-size:14px;color:#444444;line-height:1.7;">Dear ${name},</p>
         <p style="margin:0 0 20px;font-size:14px;color:#444444;line-height:1.7;">
-          We are pleased to confirm that your Standard Chartered account has been successfully created.
+          We are pleased to confirm that your Strantchar account has been successfully created.
           You now have access to our full suite of banking services, including account management,
           fund transfers, and loan facilities.
         </p>
@@ -137,7 +137,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
 
     await resend.emails.send({
       from: FROM, to,
-      subject: "Welcome to Standard Chartered — Account Confirmation",
+      subject: "Welcome to Strantchar — Account Confirmation",
       html: layout(body),
     });
   } catch (error) {
@@ -161,7 +161,7 @@ export async function sendWelcomeWithPasswordEmail(
         <p style="margin:0 0 24px;font-size:22px;font-weight:700;color:#0d2340;">Your Account Has Been Created</p>
         <p style="margin:0 0 20px;font-size:14px;color:#444444;line-height:1.7;">Dear ${name},</p>
         <p style="margin:0 0 28px;font-size:14px;color:#444444;line-height:1.7;">
-          A Standard Chartered banking account has been set up on your behalf by our team.
+          A Strantchar banking account has been set up on your behalf by our team.
           Your account is now active and ready for use. Please find your access credentials below.
         </p>
       </td></tr>
@@ -191,7 +191,7 @@ export async function sendWelcomeWithPasswordEmail(
           <tr><td style="padding:16px 20px;">
             <p style="margin:0;font-size:13px;color:#6b5500;line-height:1.7;">
               <strong>Important Security Notice:</strong> For your protection, you are required to change your password
-              upon your first login. Do not share your credentials with anyone. Standard Chartered will never ask
+              upon your first login. Do not share your credentials with anyone. Strantchar will never ask
               for your password via email or phone.
             </p>
           </td></tr>
@@ -209,7 +209,7 @@ export async function sendWelcomeWithPasswordEmail(
 
     await resend.emails.send({
       from: FROM, to,
-      subject: "Standard Chartered — Your New Account Credentials",
+      subject: "Strantchar — Your New Account Credentials",
       html: layout(body),
     });
   } catch (error) {
@@ -278,7 +278,7 @@ export async function sendTransactionEmail(
       <tr><td style="padding:28px 40px 8px;">
         <p style="margin:0 0 20px;font-size:14px;color:#444444;line-height:1.7;">Dear ${name},</p>
         <p style="margin:0 0 24px;font-size:14px;color:#444444;line-height:1.7;">
-          We wish to inform you that a transaction has been processed on your Standard Chartered account.
+          We wish to inform you that a transaction has been processed on your Strantchar account.
           Please review the details below.
         </p>
       </td></tr>
@@ -333,7 +333,7 @@ export async function sendTransactionEmail(
 
     await resend.emails.send({
       from: FROM, to,
-      subject: `Standard Chartered — ${cfg.subjectPrefix}: ${amountFormatted}`,
+      subject: `Strantchar — ${cfg.subjectPrefix}: ${amountFormatted}`,
       html: layout(body),
     });
   } catch (error) {

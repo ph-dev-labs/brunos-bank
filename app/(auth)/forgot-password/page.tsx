@@ -94,8 +94,8 @@ export default function ForgotPasswordPage() {
     <div className="card p-8">
       {/* Logo */}
       <div className="flex items-center gap-2 mb-8">
-        <img src="/logo.png" alt="Standard Chartered" className="w-8 h-8 object-contain" />
-        <span className="font-display font-bold text-xl">Standard Chartered</span>
+        <img src="/logo.png" alt="Strantchar" className="w-8 h-8 object-contain" />
+        <span className="font-display font-bold text-xl">Strantchar</span>
       </div>
 
       <h1 className="text-2xl font-display font-bold mb-1">

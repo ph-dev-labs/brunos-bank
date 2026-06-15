@@ -59,7 +59,7 @@ async function main() {
       notifications: {
         create: [
           {
-            title: "Welcome to Standard Chartered!",
+            title: "Welcome to Strantchar!",
             message: "Your account has been created successfully. Start banking with ease.",
             read: false,
           },
@@ -100,7 +100,7 @@ async function main() {
       notifications: {
         create: [
           {
-            title: "Welcome to Standard Chartered!",
+            title: "Welcome to Strantchar!",
             message: "Your account has been created successfully. Start banking with ease.",
             read: false,
           },

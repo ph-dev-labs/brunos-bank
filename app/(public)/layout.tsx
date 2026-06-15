@@ -2,7 +2,7 @@ import "@/app/globals.css";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Standard Chartered | Next-Gen Banking",
+  title: "Strantchar | Next-Gen Banking",
   description: "Modern, secure, and instant banking for everyone.",
 };
 

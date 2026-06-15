@@ -18,8 +18,8 @@ export default function LandingPage() {
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? "bg-dark-900/80 backdrop-blur-md border-b border-dark-800 py-4" : "bg-transparent py-6"}`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="Standard Chartered" className="w-8 h-8 object-contain" />
-            <span className="font-display font-bold text-xl tracking-tight">Standard Chartered</span>
+            <img src="/logo.png" alt="Strantchar" className="w-8 h-8 object-contain" />
+            <span className="font-display font-bold text-xl tracking-tight">Strantchar</span>
           </div>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300">
@@ -48,7 +48,7 @@ export default function LandingPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-300 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-400"></span>
               </span>
-              Standard Chartered is now live in the US
+              Strantchar is now live in the US
             </div>
             
             <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight leading-[1.1] mb-6">
@@ -111,7 +111,7 @@ export default function LandingPage() {
                 <span className="material-symbols-outlined text-[2rem]">bolt</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Instant Transfers</h3>
-              <p className="text-gray-400 leading-relaxed">Send money to any Standard Chartered user instantly, for free. Funds arrive in their account before you close the app.</p>
+              <p className="text-gray-400 leading-relaxed">Send money to any Strantchar user instantly, for free. Funds arrive in their account before you close the app.</p>
             </div>
 
             {/* Feature 2 */}
@@ -200,7 +200,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-primary-500/10" />
         <div className="max-w-4xl mx-auto px-6 relative z-10 text-center">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">Ready to upgrade your banking?</h2>
-          <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">Join thousands of users who have already switched to Standard Chartered.</p>
+          <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">Join thousands of users who have already switched to Strantchar.</p>
           <Link href="/login" className="inline-flex px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-full font-medium transition-all shadow-xl shadow-primary-500/20 text-lg items-center gap-2">
             Sign In Now
           </Link>
@@ -218,7 +218,7 @@ export default function LandingPage() {
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
                   </svg>
                 </div>
-                <span className="font-display font-bold text-lg">Standard Chartered</span>
+                <span className="font-display font-bold text-lg">Strantchar</span>
               </div>
               <p className="text-sm text-gray-500">The modern way to manage your money. Fast, secure, and built for the future.</p>
             </div>
@@ -254,7 +254,7 @@ export default function LandingPage() {
           </div>
           
           <div className="pt-8 border-t border-dark-800 text-center text-sm text-gray-600">
-            &copy; {new Date().getFullYear()} Standard Chartered Inc. All rights reserved.
+            &copy; {new Date().getFullYear()} Strantchar Inc. All rights reserved.
           </div>
         </div>
       </footer>
