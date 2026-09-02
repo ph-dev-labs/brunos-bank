@@ -28,7 +28,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" className="dark">
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
-        <meta name="google-site-verification" content="0mJuDYCao0b2ObQ19Jr4uIvDpyzvCUl4gPhYyQoUeDA" />
       </head>
       <body className={`${inter.variable} ${syne.variable} font-sans bg-dark-900 text-white antialiased`}>
         <GoogleTranslate />
